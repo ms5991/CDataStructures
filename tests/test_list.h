@@ -1,4 +1,4 @@
-#include "../list/list.h"
+#include "list.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -49,7 +49,7 @@ void test_list_get_length()
 {
 	list list;
 
-	int toAdd, frontValue, backValue, posValue;
+	int toAdd;
 
 	toAdd=5;
 

@@ -1,4 +1,4 @@
-#include "./tests/test_list.h"
+#include "test_list.h"
 
 
 int main(){
