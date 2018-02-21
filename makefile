@@ -73,7 +73,7 @@ TEST_MAIN_SOURCE	:= $(shell find $(TESTDIR)/$(SRCDIR) -maxdepth 1 -type f -name 
 # name the object files
 OBJECTS 			:= $(addprefix $(OBJDIR)/,$(notdir $(SOURCES:.$(SRCEXT)=.$(OBJEXT))))
 TEST_OBJECTS		:= $(addprefix $(TESTDIR)/$(OBJDIR)/,$(notdir $(TEST_SOURCES:.$(SRCEXT)=.$(OBJEXT))))
-TRY := $(OBJDIR)/%.$(OBJEXT)
+
 # compile target
 all: dirs $(TARGET)
 
@@ -125,7 +125,6 @@ vars:
 	@echo "TEST_SOURCES:		$(TEST_SOURCES)"
 	@echo "TEST_MAIN_SOURCE:	$(TEST_MAIN_SOURCE)"
 	@echo "TEST_OBJECTS:		$(TEST_OBJECTS)"
-	@echo "TRY:		$(TRY)"
 
 # remove obj and bin
 clean:
