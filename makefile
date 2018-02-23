@@ -70,21 +70,21 @@ default: all
 
 # create obj and bin directories if they don't exist
 dirs:
-    mkdir -p $(TARGETDIR) 
-    mkdir -p $(OBJDIR)
-    mkdir -p $(TESTDIR)/$(TARGETDIR) 
-    mkdir -p $(TESTDIR)/$(OBJDIR)
+	mkdir -p $(TARGETDIR) 
+	mkdir -p $(OBJDIR)
+	mkdir -p $(TESTDIR)/$(TARGETDIR) 
+	mkdir -p $(TESTDIR)/$(OBJDIR)
 
 # the main program relies on the file containing main under src and the objects
 # link the object files into the executable
 $(TARGET): $(OBJECTS)
-    @echo "Nothing to do here"
-    @# $(CC) -o $(TARGETDIR)/$@ $^ $(LDFLAGS)
+	@echo "Nothing to do here"
+	@# $(CC) -o $(TARGETDIR)/$@ $^ $(LDFLAGS)
 
 # compile source files under the subdirectories of src into .o object files
 $(OBJDIR)/%.$(OBJEXT): $(SRCDIR)/%.$(SRCEXT)
-    @echo "Compiling"
-    $(CC) $(CFLAGS) -c -o $@ $^
+	@echo "Compiling"
+	$(CC) $(CFLAGS) -c -o $@ $^
 
 # for test, need additional flags and objects
 $(TEST_TARGET): CFLAGS +=  -I $(TESTDIR)/$(INCDIR)
@@ -93,33 +93,33 @@ $(TEST_TARGET): OBJECTS += $(TEST_OBJECTS)
 # the test program relies on the file containing main under tests/src and the objects
 # link the object files into the executable
 $(TEST_TARGET): $(OBJECTS) $(TEST_OBJECTS)
-    @echo "Linking tests"
-    $(CC) -o $(TARGETDIR)/$@ $^ $(LDFLAGS)
+	@echo "Linking tests"
+	$(CC) -o $(TARGETDIR)/$@ $^ $(LDFLAGS)
 
 # compile test source files under the subdirectories of tests/src into .o object files
 $(OBJDIR)/%.$(OBJEXT): $(TESTDIR)/$(SRCDIR)/%.$(SRCEXT)
-    @echo "Compiling tests"
-    $(CC) $(CFLAGS) -c -o $@ $^
+	@echo "Compiling tests"
+	$(CC) $(CFLAGS) -c -o $@ $^
 
 # build the tests
 test: dirs $(TEST_TARGET)
-    $(TARGETDIR)/$(TEST_TARGET)
+	$(TARGETDIR)/$(TEST_TARGET)
 
 # useful to debug makefile, see what variables eval to 
 vars:
-    @echo "CFLAGS:          $(CFLAGS)"
-    @echo "OBJDIR:          $(OBJDIR)"
-    @echo "TARGETDIR:       $(TARGETDIR)"
-    @echo "TESTDIR:     $(TESTDIR)"
-    @echo "SOURCES:     $(SOURCES)"
-    @echo "OBJECTS:     $(OBJECTS)"
-    @echo "TEST_SOURCES:        $(TEST_SOURCES)"    
-    @echo "TEST_OBJECTS:        $(TEST_OBJECTS)"
+	@echo "CFLAGS:          $(CFLAGS)"
+	@echo "OBJDIR:          $(OBJDIR)"
+	@echo "TARGETDIR:       $(TARGETDIR)"
+	@echo "TESTDIR:     $(TESTDIR)"
+	@echo "SOURCES:     $(SOURCES)"
+	@echo "OBJECTS:     $(OBJECTS)"
+	@echo "TEST_SOURCES:        $(TEST_SOURCES)"    
+	@echo "TEST_OBJECTS:        $(TEST_OBJECTS)"
 
 # remove obj and bin
 clean:
-    @echo "Cleaning..."
-    rm -rf $(OBJDIR)
-    rm -rf $(TARGETDIR)
+	@echo "Cleaning..."
+	rm -rf $(OBJDIR)
+	rm -rf $(TARGETDIR)
 
 .PHONY: clean vars test all
