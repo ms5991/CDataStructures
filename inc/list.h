@@ -28,11 +28,11 @@ void list_add_to_back(list *list, void* data);
 
 void list_add_to_position(list *list, void* data, int position);
 
-void* list_delete_from_front(list *list);
+void list_delete_from_front(list *list);
 
-void* list_delete_from_back(list *list);
+void list_delete_from_back(list *list);
 
-void* list_delete_from_position(list* list, int position);
+void list_delete_from_position(list* list, int position);
 
 int list_get_length(list* list);
 
