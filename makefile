@@ -10,7 +10,7 @@ INCDIR              := inc
 SRCDIR              := src
 TARGETDIR           := bin
 OBJDIR              := obj
-LIBDIR              := lib
+LIBDIR              := 
 TESTDIR             := tests
 SRCEXT              := c
 OBJEXT              := o
@@ -107,14 +107,15 @@ test: dirs $(TEST_TARGET)
 
 # useful to debug makefile, see what variables eval to 
 vars:
-	@echo "CFLAGS:          $(CFLAGS)"
-	@echo "OBJDIR:          $(OBJDIR)"
-	@echo "TARGETDIR:       $(TARGETDIR)"
-	@echo "TESTDIR:     $(TESTDIR)"
-	@echo "SOURCES:     $(SOURCES)"
-	@echo "OBJECTS:     $(OBJECTS)"
-	@echo "TEST_SOURCES:        $(TEST_SOURCES)"    
-	@echo "TEST_OBJECTS:        $(TEST_OBJECTS)"
+	@echo "CFLAGS:			$(CFLAGS)"
+	@echo "LDFLAGS:		$(LDFLAGS)"
+	@echo "OBJDIR:			$(OBJDIR)"
+	@echo "TARGETDIR:		$(TARGETDIR)"
+	@echo "TESTDIR:		$(TESTDIR)"
+	@echo "SOURCES:		$(SOURCES)"
+	@echo "OBJECTS:		$(OBJECTS)"
+	@echo "TEST_SOURCES:		$(TEST_SOURCES)"    
+	@echo "TEST_OBJECTS:		$(TEST_OBJECTS)"
 
 # remove obj and bin
 clean:
