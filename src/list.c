@@ -3,26 +3,33 @@
 #include <string.h>
 #include <assert.h>
 
-// helper function to allocate a new node
+/* helper function to allocate a new node
+*/
 struct node* get_new_node(int dataSize, void* data){	
 
-	// create new node on heap
-	struct node *newNode = malloc(sizeof(struct node));
+	/* create new node on heap
+	*/
+	struct node *newNode; 
 
-	// create space for the data
+	newNode = malloc(sizeof(struct node));
+
+	/* create space for the data
+	*/
 	newNode->data = malloc(dataSize);
 
-	// this will prevent situations, for example, when the list is of ints,
-	// where the caller passes in the address of an int on the stack and now
-	// a node is pointing to the stack.  This will keep the node data pointers 
-	// pointing to the heap. Of course, it's possible that data is a pointer type,
-	// and it in turn is pointing to the stack, but we can't prevent that. 
+	/* this will prevent situations, for example, when the list is of ints,
+	   where the caller passes in the address of an int on the stack and now
+	   a node is pointing to the stack.  This will keep the node data pointers 
+	   pointing to the heap. Of course, it's possible that data is a pointer type,
+	   and it in turn is pointing to the stack, but we can't prevent that. 
+	*/
 	memcpy(newNode->data, data, dataSize);
 
 	return newNode;
 }
 
-// initializes a new list
+/* initializes a new list
+*/
 void list_new(list *list, int dataSize, freeDataFunction freeData){
 
 	list->dataSize = dataSize;
@@ -32,43 +39,55 @@ void list_new(list *list, int dataSize, freeDataFunction freeData){
 	list->back = NULL;
 }
 
-// frees dynamically allocated memory for this list
+/* frees dynamically allocated memory for this list
+*/
 void list_free(list *list){
 
 	struct node *currentNode;
 
-	// loop through every node
+	/* loop through every node
+	*/
 	while(list->front != NULL){
 
-		// advance the loop pointer
+		/* advance the loop pointer
+		*/
 		currentNode = list->front;
 		list->front = currentNode->next;
 
-		// if there is a free function, call it on the data
+		/* if there is a free function, call it on the data
+		*/
 		if(list->freeData != NULL){
 			list->freeData(currentNode->data);
 		}
 
-		// even if there is a free function, still need to free
-		// from the malloc in list_new
+		/* even if there is a free function, still need to free
+		   from the malloc in list_new
+		*/
 		free(currentNode->data);
 
-		// free the node itself
+		/* free the node itself
+		*/
 		free(currentNode);
 	}
 
-	// front and back to NULL
+	/* front and back to NULL
+	*/
 	list->front = NULL;
 	list->back = NULL;
 }
 
-// add a node to the front of the list
+/* add a node to the front of the list
+*/
 void list_add_to_front(list *list, void* data){
 
-	// get a new node
-	struct node *newNode = get_new_node(list->dataSize, data);
+	/* get a new node
+	*/
+	struct node *newNode;
 
-	// special case for the first node added
+	newNode = get_new_node(list->dataSize, data);
+
+	/* special case for the first node added
+	*/
 	if(list->length == 0){
 		list->front = newNode;
 		list->front->next = NULL;
@@ -80,20 +99,27 @@ void list_add_to_front(list *list, void* data){
 		list->front = newNode;
 	}
 
-	// always set the first node's previous to null
+	/* always set the first node's previous to null
+	*/
 	list->front->previous = NULL;
 
-	// increment length
+	/* increment length
+	*/
 	list->length++;
 }
 
-// add a node to the end of the list 
+/* add a node to the end of the list 
+*/
 void list_add_to_back(list *list, void *data){
 
-	// get a new node
-	struct node *newNode = get_new_node(list->dataSize, data);
+	/* get a new node
+	*/
+	struct node *newNode;
 
-	// special case for the first node added
+	newNode = get_new_node(list->dataSize, data);
+
+	/* special case for the first node added
+	*/
 	if(list->length == 0){
 		list->front = newNode;
 		list->front->next = NULL;
@@ -107,41 +133,53 @@ void list_add_to_back(list *list, void *data){
 		list->back = newNode;
 	}
 
-	// increment length
+	/* increment length
+	*/
 	list->length++;
 }
 
-// add a node at some position in the list
+/* add a node at some position in the list
+*/
 void list_add_to_position(list *list, void* data, int position){
+	
+	int i;
+
+	/* Assert position is within valid range
+	*/
 	assert(position >= 0);
 	assert(position <= list->length);
 
-	// add to front if pos = 0
-	if(list->length == 0){ 
+	/* add to front if pos = 0
+	*/
+	if(position == 0){ 
 		list_add_to_front(list, data);
-	// add to back if pos = length
-	} else if(list->length == 0){
+	/* add to back if pos = length
+	*/
+	} else if(position == list->length){
 		list_add_to_back(list, data);
 	} else {
-		// get a new node
+		/* get a new node
+		*/
 		struct node *newNode = get_new_node(list->dataSize, data);
 
-		// loop pointer
+		/* loop pointer
+		*/
 		struct node *current;
 
-		// slight optimization (factor of a constant 1/2): only iterate half the list in the worst case
+		/* slight optimization (factor of a constant 1/2): only iterate half the list in the worst case
+		*/
 		if(position < list->length / 2)
 		{
 			current = list->front;
 
-			for(int i=0;i != position;i++){
+			for(i=0;i != position;i++){
 				current = current->next;
 			}
 
 		} else {
 			current = list->back;
 
-			for(int i=list->length-1; i != position; i--){
+			for(i=list->length-1; i != position; i--){
 				current = current->previous;
 			}
 		}
@@ -155,10 +193,15 @@ void list_add_to_position(list *list, void* data, int position){
 	}
 }
 
+/* delete the node at the front of the list
+*/
 void list_delete_from_front(list *list){
+
+	struct node* toDelete;
+
 	assert(list->length > 0);
 
-	struct node* toDelete = list->front;
+	toDelete = list->front;
 
 	if(toDelete->next == NULL){
 		list->front = NULL;
@@ -168,26 +211,35 @@ void list_delete_from_front(list *list){
 		list->front = toDelete->next;		
 	}
 
-	// if there is a free function, call it on the data
+	/* if there is a free function, call it on the data
+	*/
 	if(list->freeData != NULL){
 		list->freeData(toDelete->data);
 	}
 
-	// even if there is a free function, still need to free
-	// from the malloc in list_new
+	/* even if there is a free function, still need to free
+	   from the malloc in list_new
+	*/
 	free(toDelete->data);
 
-	// free the node itself
+	/* free the node itself
+	*/
 	free(toDelete);
 
-	// decrement length
+	/* decrement length
+	*/
 	list->length--;
 }
 
+/* delete the node from the back of the list
+*/
 void list_delete_from_back(list *list){
+
+	struct node* toDelete;
+
 	assert(list->length > 0);
 
-	struct node* toDelete = list->back;
+	toDelete = list->back;
 
 	if(toDelete->previous == NULL){
 		list->front = NULL;
@@ -197,62 +249,154 @@ void list_delete_from_back(list *list){
 		list->back = toDelete->previous;		
 	}
 
-	// if there is a free function, call it on the data
+	/* if there is a free function, call it on the data
+	*/
 	if(list->freeData != NULL){
 		list->freeData(toDelete->data);
 	}
 
-	// even if there is a free function, still need to free
-	// from the malloc in list_new
+	/* even if there is a free function, still need to free
+	   from the malloc in list_new
+	*/
 	free(toDelete->data);
 
-	// free the node itself
+	/* free the node itself
+	*/
 	free(toDelete);
 
-	// decrement length
+	/* decrement length
+	*/
 	list->length--;
 }
 
-void list_delete_from_position(list* list, int position);
+/* delete the node at some position in the list
+*/
+void list_delete_from_position(list* list, int position){
 
+	int i;
+
+	/* Assert position is within valid range
+	*/
+	assert(position >= 0);
+	assert(position < list->length);
+
+	/*delete from front if pos = 0
+	*/
+	if(position == 0){ 
+		list_delete_from_front(list);
+	/* delete from back if pos = length-1
+	*/
+	} else if(list->length == (list->length) - 1){
+		list_delete_from_back(list);
+	} else {
+
+		/* loop pointer
+		*/
+		struct node *current;
+
+		/* slight optimization (factor of a constant 1/2): only iterate half the list in the worst case
+		*/
+		if(position < list->length / 2)
+		{
+			current = list->front;
+
+			for(i=0;i != position;i++){
+				current = current->next;
+			}
+
+		} else {
+			current = list->back;
+
+			for(i=list->length-1; i != position; i--){
+				current = current->previous;
+			}
+		}
+
+		/* adjust pointers of surrounding nodes
+		 next and previous will not be null because this is not the front or back node
+		*/
+		current->next->previous = current->previous;
+		current->previous->next = current->next;
+
+		/* if there is a free function, call it on the data
+		*/
+		if(list->freeData != NULL){
+			list->freeData(current->data);
+		}
+
+		/* even if there is a free function, still need to free
+		   from the malloc in list_new
+		*/
+		free(current->data);
+
+		/* free the node itself
+		*/
+		free(current);
+
+		/* decrement length 
+		*/
+		list->length--;
+	}
+}
+
+/* get the length of the list
+*/
 int list_get_length(list* list){
 	return list->length;
 }
 
-
+/* get the value at the front of the list
+*/
 void list_get_front(list* list, void* valuePtr){
 	assert(list->front != NULL);
+
+	/* copy the data so there isn't an aliased ptr
+	*/
 	memcpy(valuePtr, list->front->data, list->dataSize);
 }
 
+/* get the value at the back of the list
+*/
 void list_get_back(list* list, void* valuePtr){
 	assert(list->back != NULL);
+
+	/* copy the data so there isnt' an aliased ptr
+	*/
 	memcpy(valuePtr, list->back->data, list->dataSize);
 }
+
+/* get the value at some position in the list
+*/
 void list_get_at_position(list* list, void* valuePtr, int position){
+
+	struct node *current;
+	int i;
+
+	/* Assert position is within valid range
+	*/
 	assert(list->front != NULL);
 	assert(position >= 0);
 	assert(position < list->length);
 
-	struct node *current;
-
-	// slight optimization (factor of a constant 1/2): only iterate half the list in the worst case
+	/* find the position
+	   slight optimization (factor of a constant 1/2): only iterate half the list in the worst case
+	 */
 	if(position < list->length / 2)
 	{
 		current = list->front;
 
-		for(int i=0;i != position;i++){
+		for(i=0;i != position;i++){
 			current = current->next;
 		}
 
 	} else {
 		current = list->back;
 
-		for(int i=list->length-1; i != position; i--){
+		for(i=list->length-1; i != position; i--){
 			current = current->previous;
 		}
 	}
 
+	/* copy the value so there isn't an aliased ptr */
 	memcpy(valuePtr, current->data, list->dataSize);
 }
-
