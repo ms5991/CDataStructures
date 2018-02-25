@@ -102,7 +102,7 @@ $(OBJDIR)/%.$(OBJEXT): $(TESTDIR)/$(SRCDIR)/%.$(SRCEXT)
 	$(CC) $(CFLAGS) -c -o $@ $^
 
 # build the tests
-test: dirs $(TEST_TARGET)
+test: clean dirs $(TEST_TARGET)
 	$(TARGETDIR)/$(TEST_TARGET)
 
 # useful to debug makefile, see what variables eval to 
