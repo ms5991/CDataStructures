@@ -3,4 +3,6 @@
 
 int main(){
 	test_all_list_scenarios();
+
+	return 0;
 }
