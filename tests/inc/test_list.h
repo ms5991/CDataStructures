@@ -21,14 +21,17 @@ void test_list_add_to_pos_length_empty_int();
 
 void test_list_add_to_pos_non_empty_int();
 
-
 void test_list_delete_from_front_to_empty_int();
+
 void test_list_delete_from_front_to_non_empty_int();
 
 void test_list_delete_from_back_to_empty_int();
+
 void test_list_delete_from_back_to_non_empty_int();
 
+void test_list_add_delete_front_each_position();
 
+void test_list_add_delete_back_each_position();
 
 void test_list_new_str();
 
