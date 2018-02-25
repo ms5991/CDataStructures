@@ -17,7 +17,7 @@ OBJEXT              := o
 LIBS                :=
 
 # flags and libraries
-CFLAGS              += -Wall -O3 -I $(INCDIR)
+CFLAGS              += -Wall -O3 -I $(INCDIR) -ansi -pedantic
 LDFLAGS             += $(foreach librarydir, $(LIBDIR), -L$(librarydir))
 LDFLAGS             += $(foreach library, $(LIBS), -l$(library))
 
