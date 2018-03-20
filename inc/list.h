@@ -3,6 +3,8 @@
 
 typedef void (*freeDataFunction)(void *);
 
+typedef int (*compareValuesFunction)(void *, void*);
+
 struct node {
 	struct node* next;
 	struct node* previous;
@@ -41,5 +43,7 @@ void list_get_front(list* list, void* valuePtr);
 void list_get_back(list* list, void* valuePtr);
 
 void list_get_at_position(list* list, void* valuePtr, int position);
+
+void list_merge_sort(list* list, compareValuesFunction compare);
 
 #endif

@@ -3,6 +3,9 @@
 #include <string.h>
 #include <assert.h>
 
+void split_list(list*, list*, list*);
+void merge_list(list*, list*, list*, compareValuesFunction);
+
 /* helper function to allocate a new node
 */
 struct node* get_new_node(int dataSize, void* data){	
@@ -400,3 +403,57 @@ void list_get_at_position(list* list, void* valuePtr, int position){
 	/* copy the value so there isn't an aliased ptr */
 	memcpy(valuePtr, current->data, list->dataSize);
 }
+
+void list_merge_sort(list* originalList, compareValuesFunction compare){
+	list firstHalf, secondHalf;
+
+	/*list of length 0 or 1 is sorted*/
+	if(originalList->length <= 1) return; 
+
+	split_list(originalList, &firstHalf, &secondHalf);
+
+	list_merge_sort(&firstHalf, compare);
+	list_merge_sort(&secondHalf, compare);
+
+	merge_list(originalList, &firstHalf, &secondHalf);
+}
+
+void split_list(list* originalList, list* firstHalf, list* secondHalf){	
+	int originalLength, midPoint, i;
+	struct node *traversal;
+
+	originalLength = list_get_length(originalList);
+	midPoint = originalLength / 2;
+
+	firstHalf->front = originalList->front;
+	traversal = firstHalf->front;
+
+	for(i=0;i<midPoint;i++){
+		traversal = traversal->next;
+	}
+
+	secondHalf->front = traversal;
+
+	firstHalf->length = midPoint;
+	secondHalf->length = originalLength - midPoint;
+}
+
+void merge_list(list* originalList, list* firstHalf, list* secondHalf, compareValuesFunction compare){
+	struct node* temp;
+	int compareValue;
+	
+	if(firstHalf->length == 0){
+		originalList->front = secondHalf->front;
+		originalList->back = secondHalf->back;
+	} else if(secondHalf->length == 0){
+		originalList->front = firstHalf->front;
+		originalList->back = firstHalf->back;
+	} else {
+
+
+
+
+	}
+
+}
+
