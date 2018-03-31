@@ -1,6 +1,8 @@
 #ifndef __LISTGUARD_H
 #define __LISTGUARD_H
 
+void init_test_harness();
+
 void test_list_new_int();
 
 void test_list_free();
@@ -32,6 +34,12 @@ void test_list_delete_from_back_to_non_empty_int();
 void test_list_add_delete_front_each_position();
 
 void test_list_add_delete_back_each_position();
+
+void test_list_sort_int();
+
+void test_list_sort_single_int();
+	
+void test_list_sort_int_empty();
 
 void test_list_new_str();
 

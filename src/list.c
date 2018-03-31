@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-
+#include <stdio.h>
 void split_list(list*, list*, list*);
 void merge_list(list*, list*, list*, compareValuesFunction);
 
@@ -168,23 +168,11 @@ void list_add_to_position(list *list, void* data, int position){
 		/* loop pointer
 		*/
 		struct node *current;
+		
+		current = list->front;
 
-		/* slight optimization (factor of a constant 1/2): only iterate half the list in the worst case
-		*/
-		if(position < list->length / 2)
-		{
-			current = list->front;
-
-			for(i=0;i != position;i++){
-				current = current->next;
-			}
-
-		} else {
-			current = list->back;
-
-			for(i=list->length-1; i != position; i--){
-				current = current->previous;
-			}
+		for(i=0;i != position;i++){
+			current = current->next;
 		}
 
 		newNode->previous = current->previous;
@@ -297,22 +285,10 @@ void list_delete_from_position(list* list, int position){
 		*/
 		struct node *current;
 
-		/* slight optimization (factor of a constant 1/2): only iterate half the list in the worst case
-		*/
-		if(position < list->length / 2)
-		{
-			current = list->front;
+		current = list->front;
 
-			for(i=0;i != position;i++){
-				current = current->next;
-			}
-
-		} else {
-			current = list->back;
-
-			for(i=list->length-1; i != position; i--){
-				current = current->previous;
-			}
+		for(i=0;i != position;i++){
+			current = current->next;
 		}
 
 		/* adjust pointers of surrounding nodes
@@ -368,6 +344,7 @@ void list_get_back(list* list, void* valuePtr){
 	memcpy(valuePtr, list->back->data, list->dataSize);
 }
 
+
 /* get the value at some position in the list
 */
 void list_get_at_position(list* list, void* valuePtr, int position){
@@ -381,41 +358,51 @@ void list_get_at_position(list* list, void* valuePtr, int position){
 	assert(position >= 0);
 	assert(position < list->length);
 
-	/* find the position
-	   slight optimization (factor of a constant 1/2): only iterate half the list in the worst case
-	 */
-	if(position < list->length / 2)
-	{
-		current = list->front;
+	current = list->front;
 
-		for(i=0;i != position;i++){
-			current = current->next;
-		}
-
-	} else {
-		current = list->back;
-
-		for(i=list->length-1; i != position; i--){
-			current = current->previous;
-		}
+	for(i=0;i != position;i++){
+		current = current->next;
 	}
 
 	/* copy the value so there isn't an aliased ptr */
 	memcpy(valuePtr, current->data, list->dataSize);
 }
 
+struct node* merge_list_node(struct node*, struct node*, compareValuesFunction);
+
+
+void list_print_int(list* list){
+	int i;
+	int value;
+	
+	printf("List with length %d:\n", list_get_length(list));
+	for(i=0;i<list_get_length(list);i++){
+		/*printf("Getting value for pos %d in list of length %d\n", i, list_get_length(list));
+		*/
+		list_get_at_position(list, &value, i);
+		printf("%d\n", value);
+	}
+}
+
 void list_merge_sort(list* originalList, compareValuesFunction compare){
+	
 	list firstHalf, secondHalf;
 
 	/*list of length 0 or 1 is sorted*/
 	if(originalList->length <= 1) return; 
 
+	/*new lists*/
+	list_new(&firstHalf, originalList->dataSize, originalList->freeData);
+	list_new(&secondHalf, originalList->dataSize, originalList->freeData);
+
+	/*split the list into first half and second half*/
 	split_list(originalList, &firstHalf, &secondHalf);
 
+	/*merge the two halves*/
 	list_merge_sort(&firstHalf, compare);
 	list_merge_sort(&secondHalf, compare);
 
-	merge_list(originalList, &firstHalf, &secondHalf);
+	originalList->front = merge_list_node(firstHalf.front, secondHalf.front, compare);
 }
 
 void split_list(list* originalList, list* firstHalf, list* secondHalf){	
@@ -433,27 +420,42 @@ void split_list(list* originalList, list* firstHalf, list* secondHalf){
 	}
 
 	secondHalf->front = traversal;
+	secondHalf->back = originalList->back;
+
+	if(traversal->previous != NULL){
+		firstHalf->back = traversal->previous;
+	} else{
+		firstHalf->back = traversal;
+	}
+
+	secondHalf->front->previous->next = NULL;
 
 	firstHalf->length = midPoint;
 	secondHalf->length = originalLength - midPoint;
 }
 
-void merge_list(list* originalList, list* firstHalf, list* secondHalf, compareValuesFunction compare){
-	struct node* temp;
+struct node* merge_list_node(struct node* first, struct node* second, compareValuesFunction compare){
 	int compareValue;
-	
-	if(firstHalf->length == 0){
-		originalList->front = secondHalf->front;
-		originalList->back = secondHalf->back;
-	} else if(secondHalf->length == 0){
-		originalList->front = firstHalf->front;
-		originalList->back = firstHalf->back;
-	} else {
 
+	if(first == NULL){
+		return second;
 
+	} else if(second == NULL){
+		return first;
 
+	} else{
 
+		compareValue = compare(first->data, second->data);
+
+		if(compareValue > 0){
+			
+			first->next = merge_list_node(first->next, second, compare);
+			return first;
+		} else {
+
+			second->next = merge_list_node(first, second->next, compare);
+			return second;
+		}
 	}
-
 }
 

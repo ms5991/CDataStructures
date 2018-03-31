@@ -1,6 +1,7 @@
 #include "list.h"
 #include "test_list.h"
 #include <stdlib.h>
+#include <time.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -8,6 +9,12 @@
 #define AMOUNT_TO_ADD 10
 #define VALUE_TO_ADD AMOUNT_TO_ADD+1
 #define POS_TO_ADD AMOUNT_TO_ADD/2
+#define EVEN_NUMBER 10
+#define ODD_NUMBER EVEN_NUMBER+1
+
+void init_test_harness(){
+	srand(time(NULL));   
+}
 
 /* test to make sure list_new behaves correctly
 */
@@ -790,6 +797,135 @@ void test_list_add_delete_back_each_position(){
 	printf("Test list delete back each position SUCCEEDED\n");
 }
 
+int compareInts(void* int1, void* int2){
+	int first, second;
+
+	first = *((int*)int1);
+	second = *((int*)int2);
+
+	if(first < second){
+		return 1;
+	} else if (first == second){
+		return 0;
+	} else {
+		return -1;
+	}
+
+}
+
+void test_list_sort_int(){
+
+	list list;
+	int value, i, posValue, previousValue, numberToAdd;
+
+	numberToAdd = EVEN_NUMBER;
+
+	/* new list
+	*/
+	list_new(&list, sizeof(int), NULL);
+
+	for(i=0;i<numberToAdd;i++){
+		value = rand() % numberToAdd;
+		printf("Adding %d at %d\n", value, i);
+		list_add_to_front(&list, &value);
+	}
+
+
+	list_merge_sort(&list, &compareInts);
+
+
+	list_get_at_position(&list, &previousValue, 0);
+
+	for(i=1;i<8;i++){
+		list_get_at_position(&list, &posValue, i);
+		printf("Pos %d has %d\n", i, posValue);
+
+		assert(previousValue <= posValue);
+
+		previousValue = posValue;
+	}
+
+	assert(list.back->next == NULL);
+	assert(list.front->previous == NULL);
+
+	list_free(&list);
+
+	printf("Test list sort int SUCCEEDED\n");
+}
+
+void test_list_sort_int_empty(){
+
+	list list;
+
+	list_new(&list, sizeof(int), NULL);
+
+	list_merge_sort(&list, &compareInts);
+
+	/* length should be zero
+	*/
+	assert(list_get_length(&list) == 0);
+
+	/* data size should be what was passed in
+	*/
+	assert(list.dataSize = sizeof(int));
+
+	/* front and back should be null
+	*/
+	assert(list.front == NULL);
+	assert(list.back == NULL);
+
+	/* no function was passed in
+	*/
+	assert(list.freeData == NULL);
+
+	list_free(&list);
+
+	printf("Test list sort empty SUCCEEDED\n");
+}
+
+
+/* make sure sorting a list of length 1 behaves correctly
+*/
+void test_list_sort_single_int(){
+	list list;
+
+	int toAdd, frontValue, backValue, posValue;
+
+	toAdd = VALUE_TO_ADD;
+
+	/* create the list
+	*/
+	list_new(&list, sizeof(int), NULL);
+
+	/* add the value
+	*/
+	list_add_to_front(&list, &toAdd);
+
+	list_merge_sort(&list, &compareInts);
+
+	/* get the value in 3 different ways
+	*/
+	list_get_front(&list, &frontValue);
+	list_get_back(&list, &backValue);
+	list_get_at_position(&list, &posValue, 0);
+
+	/* make sure all the values are correct
+	*/
+	assert(frontValue == toAdd);
+	assert(backValue == toAdd);
+	assert(posValue == toAdd);
+
+	/* make sure the length was incremented
+	*/
+	assert(list_get_length(&list) == 1);
+
+	/* free the list
+	*/
+	list_free(&list);
+
+	printf("Test list sort single SUCCEEDED\n");
+}
+
 /* test new list using char*
 */
 void test_list_new_str(){
@@ -838,6 +974,9 @@ void test_list_add_to_front_empty_str(){
 /* call all test functions
 */
 void test_all_list_scenarios() {
+	init_test_harness();
+
+
 	test_list_new_int();
 	test_list_free();
 	test_list_add_to_front_empty_int();
@@ -854,6 +993,10 @@ void test_all_list_scenarios() {
 	test_list_delete_from_back_to_non_empty_int();
 	test_list_add_delete_front_each_position();
 	test_list_add_delete_back_each_position();
+	test_list_sort_int();
+	test_list_sort_single_int();
+	test_list_sort_int_empty();
+
 	test_list_new_str();
 	test_list_add_to_front_empty_str();
 }
