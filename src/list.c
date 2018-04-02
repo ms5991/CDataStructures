@@ -403,15 +403,21 @@ void list_merge_sort(list* originalList, compareValuesFunction compare){
 	list_merge_sort(&secondHalf, compare);
 
 	originalList->front = merge_list_node(firstHalf.front, secondHalf.front, compare);
+	originalList->back = secondHalf.back;
 }
-
+int total = 0;
 void split_list(list* originalList, list* firstHalf, list* secondHalf){	
 	int originalLength, midPoint, i;
 	struct node *traversal;
 
+	/*
+		Calculate the lengths
+	*/
 	originalLength = list_get_length(originalList);
 	midPoint = originalLength / 2;
-
+	/*
+		Find the midpoint and set the fronts
+	*/
 	firstHalf->front = originalList->front;
 	traversal = firstHalf->front;
 
@@ -429,6 +435,7 @@ void split_list(list* originalList, list* firstHalf, list* secondHalf){
 	}
 
 	secondHalf->front->previous->next = NULL;
+	secondHalf->front->previous = NULL;
 
 	firstHalf->length = midPoint;
 	secondHalf->length = originalLength - midPoint;
@@ -436,7 +443,8 @@ void split_list(list* originalList, list* firstHalf, list* secondHalf){
 
 struct node* merge_list_node(struct node* first, struct node* second, compareValuesFunction compare){
 	int compareValue;
-
+	printf("Total: %d\n", total);
+total++;
 	if(first == NULL){
 		return second;
 
@@ -450,10 +458,19 @@ struct node* merge_list_node(struct node* first, struct node* second, compareVal
 		if(compareValue > 0){
 			
 			first->next = merge_list_node(first->next, second, compare);
+
+			if(first->next != NULL){
+				first->next->previous = first;
+			}
+
 			return first;
 		} else {
-
 			second->next = merge_list_node(first, second->next, compare);
+
+			if(second->next != NULL){
+				printf("hit\n");
+				second->next->previous = second;
+			}
 			return second;
 		}
 	}
