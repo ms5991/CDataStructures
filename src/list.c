@@ -398,14 +398,14 @@ void list_merge_sort(list* originalList, compareValuesFunction compare){
 	/*split the list into first half and second half*/
 	split_list(originalList, &firstHalf, &secondHalf);
 
-	/*merge the two halves*/
+	/*sort the two halves*/
 	list_merge_sort(&firstHalf, compare);
 	list_merge_sort(&secondHalf, compare);
 
 	originalList->front = merge_list_node(firstHalf.front, secondHalf.front, compare);
 	originalList->back = secondHalf.back;
 }
-int total = 0;
+
 void split_list(list* originalList, list* firstHalf, list* secondHalf){	
 	int originalLength, midPoint, i;
 	struct node *traversal;
@@ -442,37 +442,60 @@ void split_list(list* originalList, list* firstHalf, list* secondHalf){
 }
 
 struct node* merge_list_node(struct node* first, struct node* second, compareValuesFunction compare){
-	int compareValue;
-	printf("Total: %d\n", total);
-total++;
+	int compareValue, i;
+	struct node* frontFirst, *frontSecond, *result, *traversal;
+
 	if(first == NULL){
 		return second;
-
 	} else if(second == NULL){
 		return first;
-
 	} else{
 
 		compareValue = compare(first->data, second->data);
 
 		if(compareValue > 0){
-			
-			first->next = merge_list_node(first->next, second, compare);
-
-			if(first->next != NULL){
-				first->next->previous = first;
-			}
-
-			return first;
-		} else {
-			second->next = merge_list_node(first, second->next, compare);
-
-			if(second->next != NULL){
-				printf("hit\n");
-				second->next->previous = second;
-			}
-			return second;
+			result = first;
+			frontFirst = first->next;
+			frontSecond = second;
+		} else{
+			result = second;
+			frontSecond = second->next;
+			frontFirst = first;
 		}
+
+		traversal = result;
+
+		traversal->previous = NULL;
+
+		while(frontFirst != NULL || frontSecond != NULL)
+		{
+			if(frontFirst == NULL){
+				compareValue = -1;
+			} else if (frontSecond == NULL){
+				compareValue = 1;
+			} else {
+				compareValue = compare(frontFirst->data, frontSecond->data);
+			}
+
+			if(compareValue > 0){
+				traversal->next = frontFirst;
+				traversal->next->previous = traversal;
+				traversal = traversal->next;
+
+				frontFirst = frontFirst->next;
+
+			} else{
+
+				traversal->next = frontSecond;
+				traversal->next->previous = traversal;
+				traversal = traversal->next;
+				
+				frontSecond = frontSecond->next;
+			}
+		}
+
+		traversal->next = NULL;
+		return result;
 	}
 }
 
