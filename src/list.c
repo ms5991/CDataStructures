@@ -3,8 +3,10 @@
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
+
+
 void split_list(list*, list*, list*);
-void merge_list(list*, list*, list*, compareValuesFunction);
+void merge_list_node(list* originalList, struct node*, struct node*, compareValuesFunction);
 
 /* helper function to allocate a new node
 */
@@ -368,21 +370,6 @@ void list_get_at_position(list* list, void* valuePtr, int position){
 	memcpy(valuePtr, current->data, list->dataSize);
 }
 
-struct node* merge_list_node(struct node*, struct node*, compareValuesFunction);
-
-
-void list_print_int(list* list){
-	int i;
-	int value;
-	
-	printf("List with length %d:\n", list_get_length(list));
-	for(i=0;i<list_get_length(list);i++){
-		/*printf("Getting value for pos %d in list of length %d\n", i, list_get_length(list));
-		*/
-		list_get_at_position(list, &value, i);
-		printf("%d\n", value);
-	}
-}
 
 void list_merge_sort(list* originalList, compareValuesFunction compare){
 	
@@ -402,8 +389,7 @@ void list_merge_sort(list* originalList, compareValuesFunction compare){
 	list_merge_sort(&firstHalf, compare);
 	list_merge_sort(&secondHalf, compare);
 
-	originalList->front = merge_list_node(firstHalf.front, secondHalf.front, compare);
-	originalList->back = secondHalf.back;
+	merge_list_node(originalList, firstHalf.front, secondHalf.front, compare);
 }
 
 void split_list(list* originalList, list* firstHalf, list* secondHalf){	
@@ -425,6 +411,7 @@ void split_list(list* originalList, list* firstHalf, list* secondHalf){
 		traversal = traversal->next;
 	}
 
+	/*set front and back for second half*/
 	secondHalf->front = traversal;
 	secondHalf->back = originalList->back;
 
@@ -437,38 +424,64 @@ void split_list(list* originalList, list* firstHalf, list* secondHalf){
 	secondHalf->front->previous->next = NULL;
 	secondHalf->front->previous = NULL;
 
+	/*set the lengths*/
 	firstHalf->length = midPoint;
 	secondHalf->length = originalLength - midPoint;
 }
 
-struct node* merge_list_node(struct node* first, struct node* second, compareValuesFunction compare){
+void merge_list_node(list* originalList, struct node* first, struct node* second, compareValuesFunction compare){
 	int compareValue;
-	struct node* frontFirst, *frontSecond, *result, *traversal;
+	struct node* frontFirst, *frontSecond, *traversal;
 
+	/*If first or second is null, just return the other one, because it is sorted*/
 	if(first == NULL){
-		return second;
+		originalList->front = second;
+
+		traversal = second;
+
+		/*find the back*/
+		while(traversal->next != NULL)
+		{
+			traversal = traversal->next;
+		}
+
+		originalList->back = traversal;
+
 	} else if(second == NULL){
-		return first;
+		originalList->front = first;
+
+		traversal = first;
+
+		/*find the back*/
+		while(traversal->next != NULL)
+		{
+			traversal = traversal->next;
+		}
+
+		originalList->back = traversal;
 	} else{
 
+		/*compare the first ones*/
 		compareValue = compare(first->data, second->data);
 
 		if(compareValue > 0){
-			result = first;
+			originalList->front = first;
 			frontFirst = first->next;
 			frontSecond = second;
 		} else{
-			result = second;
+			originalList->front = second;
 			frontSecond = second->next;
 			frontFirst = first;
 		}
 
-		traversal = result;
+		/*set the front*/
+		traversal = originalList->front;
 
 		traversal->previous = NULL;
 
 		while(frontFirst != NULL || frontSecond != NULL)
 		{
+			/*compare the fronts*/
 			if(frontFirst == NULL){
 				compareValue = -1;
 			} else if (frontSecond == NULL){
@@ -477,6 +490,7 @@ struct node* merge_list_node(struct node* first, struct node* second, compareVal
 				compareValue = compare(frontFirst->data, frontSecond->data);
 			}
 
+			/*take the bigger one and set pointers*/
 			if(compareValue > 0){
 				traversal->next = frontFirst;
 				traversal->next->previous = traversal;
@@ -494,8 +508,11 @@ struct node* merge_list_node(struct node* first, struct node* second, compareVal
 			}
 		}
 
+		/*list->back->next == NULL*/
 		traversal->next = NULL;
-		return result;
+
+		/*set the back*/
+		originalList->back = traversal;
 	}
 }
 
