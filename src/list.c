@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdio.h>
+
+
+void split_list(list*, list*, list*);
+void merge_list_node(list* originalList, struct node*, struct node*, compareValuesFunction);
 
 /* helper function to allocate a new node
 */
@@ -165,23 +170,11 @@ void list_add_to_position(list *list, void* data, int position){
 		/* loop pointer
 		*/
 		struct node *current;
+		
+		current = list->front;
 
-		/* slight optimization (factor of a constant 1/2): only iterate half the list in the worst case
-		*/
-		if(position < list->length / 2)
-		{
-			current = list->front;
-
-			for(i=0;i != position;i++){
-				current = current->next;
-			}
-
-		} else {
-			current = list->back;
-
-			for(i=list->length-1; i != position; i--){
-				current = current->previous;
-			}
+		for(i=0;i != position;i++){
+			current = current->next;
 		}
 
 		newNode->previous = current->previous;
@@ -294,22 +287,10 @@ void list_delete_from_position(list* list, int position){
 		*/
 		struct node *current;
 
-		/* slight optimization (factor of a constant 1/2): only iterate half the list in the worst case
-		*/
-		if(position < list->length / 2)
-		{
-			current = list->front;
+		current = list->front;
 
-			for(i=0;i != position;i++){
-				current = current->next;
-			}
-
-		} else {
-			current = list->back;
-
-			for(i=list->length-1; i != position; i--){
-				current = current->previous;
-			}
+		for(i=0;i != position;i++){
+			current = current->next;
 		}
 
 		/* adjust pointers of surrounding nodes
@@ -365,6 +346,7 @@ void list_get_back(list* list, void* valuePtr){
 	memcpy(valuePtr, list->back->data, list->dataSize);
 }
 
+
 /* get the value at some position in the list
 */
 void list_get_at_position(list* list, void* valuePtr, int position){
@@ -378,25 +360,159 @@ void list_get_at_position(list* list, void* valuePtr, int position){
 	assert(position >= 0);
 	assert(position < list->length);
 
-	/* find the position
-	   slight optimization (factor of a constant 1/2): only iterate half the list in the worst case
-	 */
-	if(position < list->length / 2)
-	{
-		current = list->front;
+	current = list->front;
 
-		for(i=0;i != position;i++){
-			current = current->next;
-		}
-
-	} else {
-		current = list->back;
-
-		for(i=list->length-1; i != position; i--){
-			current = current->previous;
-		}
+	for(i=0;i != position;i++){
+		current = current->next;
 	}
 
 	/* copy the value so there isn't an aliased ptr */
 	memcpy(valuePtr, current->data, list->dataSize);
 }
+
+
+void list_merge_sort(list* originalList, compareValuesFunction compare){
+	
+	list firstHalf, secondHalf;
+
+	/*list of length 0 or 1 is sorted*/
+	if(originalList->length <= 1) return; 
+
+	/*new lists*/
+	list_new(&firstHalf, originalList->dataSize, originalList->freeData);
+	list_new(&secondHalf, originalList->dataSize, originalList->freeData);
+
+	/*split the list into first half and second half*/
+	split_list(originalList, &firstHalf, &secondHalf);
+
+	/*sort the two halves*/
+	list_merge_sort(&firstHalf, compare);
+	list_merge_sort(&secondHalf, compare);
+
+	merge_list_node(originalList, firstHalf.front, secondHalf.front, compare);
+}
+
+void split_list(list* originalList, list* firstHalf, list* secondHalf){	
+	int originalLength, midPoint, i;
+	struct node *traversal;
+
+	/*
+		Calculate the lengths
+	*/
+	originalLength = list_get_length(originalList);
+	midPoint = originalLength / 2;
+	/*
+		Find the midpoint and set the fronts
+	*/
+	firstHalf->front = originalList->front;
+	traversal = firstHalf->front;
+
+	for(i=0;i<midPoint;i++){
+		traversal = traversal->next;
+	}
+
+	/*set front and back for second half*/
+	secondHalf->front = traversal;
+	secondHalf->back = originalList->back;
+
+	if(traversal->previous != NULL){
+		firstHalf->back = traversal->previous;
+	} else{
+		firstHalf->back = traversal;
+	}
+
+	secondHalf->front->previous->next = NULL;
+	secondHalf->front->previous = NULL;
+
+	/*set the lengths*/
+	firstHalf->length = midPoint;
+	secondHalf->length = originalLength - midPoint;
+}
+
+void merge_list_node(list* originalList, struct node* first, struct node* second, compareValuesFunction compare){
+	int compareValue;
+	struct node* frontFirst, *frontSecond, *traversal;
+
+	/*If first or second is null, just return the other one, because it is sorted*/
+	if(first == NULL){
+		originalList->front = second;
+
+		traversal = second;
+
+		/*find the back*/
+		while(traversal->next != NULL)
+		{
+			traversal = traversal->next;
+		}
+
+		originalList->back = traversal;
+
+	} else if(second == NULL){
+		originalList->front = first;
+
+		traversal = first;
+
+		/*find the back*/
+		while(traversal->next != NULL)
+		{
+			traversal = traversal->next;
+		}
+
+		originalList->back = traversal;
+	} else{
+
+		/*compare the first ones*/
+		compareValue = compare(first->data, second->data);
+
+		if(compareValue > 0){
+			originalList->front = first;
+			frontFirst = first->next;
+			frontSecond = second;
+		} else{
+			originalList->front = second;
+			frontSecond = second->next;
+			frontFirst = first;
+		}
+
+		/*set the front*/
+		traversal = originalList->front;
+
+		traversal->previous = NULL;
+
+		while(frontFirst != NULL || frontSecond != NULL)
+		{
+			/*compare the fronts*/
+			if(frontFirst == NULL){
+				compareValue = -1;
+			} else if (frontSecond == NULL){
+				compareValue = 1;
+			} else {
+				compareValue = compare(frontFirst->data, frontSecond->data);
+			}
+
+			/*take the bigger one and set pointers*/
+			if(compareValue > 0){
+				traversal->next = frontFirst;
+				traversal->next->previous = traversal;
+				traversal = traversal->next;
+
+				frontFirst = frontFirst->next;
+
+			} else{
+
+				traversal->next = frontSecond;
+				traversal->next->previous = traversal;
+				traversal = traversal->next;
+				
+				frontSecond = frontSecond->next;
+			}
+		}
+
+		/*list->back->next == NULL*/
+		traversal->next = NULL;
+
+		/*set the back*/
+		originalList->back = traversal;
+	}
+}
+

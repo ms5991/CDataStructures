@@ -33,6 +33,18 @@ void test_list_add_delete_front_each_position();
 
 void test_list_add_delete_back_each_position();
 
+void test_list_sort_int_even();
+
+void test_list_sort_int_odd();
+
+void test_list_sort_sorted();
+
+void test_list_sort_reversed();
+
+void test_list_sort_single_int();
+	
+void test_list_sort_int_empty();
+
 void test_list_new_str();
 
 void test_list_add_to_front_empty_str();
