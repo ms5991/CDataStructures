@@ -1,5 +1,5 @@
-#ifndef __LISTGUARD_H
-#define __LISTGUARD_H
+#ifndef __LISTTESTGUARD_H
+#define __LISTTESTGUARD_H
 
 void test_list_new_int();
 
