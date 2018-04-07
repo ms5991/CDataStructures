@@ -9,7 +9,7 @@
 #define AMOUNT_TO_ADD 10
 #define VALUE_TO_ADD AMOUNT_TO_ADD+1
 #define POS_TO_ADD AMOUNT_TO_ADD/2
-#define EVEN_NUMBER 64
+#define EVEN_NUMBER 8
 #define ODD_NUMBER EVEN_NUMBER+1
 
 void init_test_harness(){
@@ -835,6 +835,7 @@ void test_list_sort_int_even(){
 
 
 	list_get_at_position(&list, &previousValue, 0);
+	printf("Pos %d has %d\n", 0, previousValue);
 
 	for(i=1;i<numberToAdd;i++){
 		list_get_at_position(&list, &posValue, i);

@@ -442,7 +442,7 @@ void split_list(list* originalList, list* firstHalf, list* secondHalf){
 }
 
 struct node* merge_list_node(struct node* first, struct node* second, compareValuesFunction compare){
-	int compareValue, i;
+	int compareValue;
 	struct node* frontFirst, *frontSecond, *result, *traversal;
 
 	if(first == NULL){
