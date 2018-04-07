@@ -1,8 +1,6 @@
 #ifndef __LISTGUARD_H
 #define __LISTGUARD_H
 
-void init_test_harness();
-
 void test_list_new_int();
 
 void test_list_free();

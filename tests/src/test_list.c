@@ -1,7 +1,6 @@
 #include "list.h"
 #include "test_list.h"
 #include <stdlib.h>
-#include <time.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -12,9 +11,6 @@
 #define EVEN_NUMBER 8
 #define ODD_NUMBER EVEN_NUMBER+1
 
-void init_test_harness(){
-	srand(time(NULL));   
-}
 
 /* test to make sure list_new behaves correctly
 */
@@ -816,7 +812,7 @@ int compareInts(void* int1, void* int2){
 void test_list_sort_int_even(){
 
 	list list;
-	int value, i, posValue, previousValue, numberToAdd;
+	int value, i, posValue, previousValue, numberToAdd, originalLength;
 
 	numberToAdd = EVEN_NUMBER;
 
@@ -826,20 +822,19 @@ void test_list_sort_int_even(){
 
 	for(i=0;i<numberToAdd;i++){
 		value = rand() % numberToAdd;
-		printf("Adding %d at %d\n", value, i);
 		list_add_to_front(&list, &value);
 	}
 
+	originalLength = list_get_length(&list);
 
 	list_merge_sort(&list, &compareInts);
 
+	assert(originalLength == list_get_length(&list));
 
 	list_get_at_position(&list, &previousValue, 0);
-	printf("Pos %d has %d\n", 0, previousValue);
 
 	for(i=1;i<numberToAdd;i++){
 		list_get_at_position(&list, &posValue, i);
-		printf("Pos %d has %d\n", i, posValue);
 
 		assert(previousValue <= posValue);
 
@@ -857,7 +852,7 @@ void test_list_sort_int_even(){
 void test_list_sort_int_odd(){
 
 	list list;
-	int value, i, posValue, previousValue, numberToAdd;
+	int value, i, posValue, previousValue, numberToAdd, originalLength;
 
 	numberToAdd = ODD_NUMBER;
 
@@ -867,19 +862,19 @@ void test_list_sort_int_odd(){
 
 	for(i=0;i<numberToAdd;i++){
 		value = rand() % numberToAdd;
-		printf("Adding %d at %d\n", value, i);
 		list_add_to_front(&list, &value);
 	}
 
+	originalLength = list_get_length(&list);
 
 	list_merge_sort(&list, &compareInts);
 
+	assert(originalLength == list_get_length(&list));
 
 	list_get_at_position(&list, &previousValue, 0);
 
 	for(i=1;i<numberToAdd;i++){
 		list_get_at_position(&list, &posValue, i);
-		printf("Pos %d has %d\n", i, posValue);
 
 		assert(previousValue <= posValue);
 
@@ -898,7 +893,7 @@ void test_list_sort_int_odd(){
 void test_list_sort_sorted(){
 
 	list list;
-	int i, posValue, numberToAdd;
+	int i, posValue, numberToAdd, originalLength;
 
 	numberToAdd = AMOUNT_TO_ADD;
 
@@ -910,9 +905,11 @@ void test_list_sort_sorted(){
 		list_add_to_front(&list, &i);
 	}
 
+	originalLength = list_get_length(&list);
 
 	list_merge_sort(&list, &compareInts);
 
+	assert(originalLength == list_get_length(&list));
 
 	for(i=0;i<numberToAdd;i++){
 		list_get_at_position(&list, &posValue, i);
@@ -932,7 +929,7 @@ void test_list_sort_sorted(){
 void test_list_sort_reversed(){
 
 	list list;
-	int i, posValue, numberToAdd;
+	int i, posValue, numberToAdd, originalLength;
 
 	numberToAdd = AMOUNT_TO_ADD;
 
@@ -944,9 +941,11 @@ void test_list_sort_reversed(){
 		list_add_to_back(&list, &i);
 	}
 
+	originalLength = list_get_length(&list);
 
 	list_merge_sort(&list, &compareInts);
 
+	assert(originalLength == list_get_length(&list));
 
 	for(i=0;i<numberToAdd;i++){
 		list_get_at_position(&list, &posValue, i);
@@ -1084,9 +1083,6 @@ void test_list_add_to_front_empty_str(){
 /* call all test functions
 */
 void test_all_list_scenarios() {
-	init_test_harness();
-
-
 	test_list_new_int();
 	test_list_free();
 	test_list_add_to_front_empty_int();
