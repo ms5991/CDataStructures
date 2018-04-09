@@ -1083,6 +1083,7 @@ void test_list_add_to_front_empty_str(){
 /* call all test functions
 */
 void test_all_list_scenarios() {
+	printf("======= LIST TESTS ========\n");
 	test_list_new_int();
 	test_list_free();
 	test_list_add_to_front_empty_int();

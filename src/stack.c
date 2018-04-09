@@ -1,4 +1,3 @@
-#include "list.h"
 #include "stack.h"
 #include <stdlib.h>
 #include <string.h>
@@ -6,12 +5,17 @@
 #include <stdio.h>
 
 void stack_new(stack *stack, int dataSize, freeDataFunction freeData){
+	stack->list = malloc(sizeof(list));
 	list_new(stack->list, dataSize, freeData);
 }
 
 void stack_free(stack *stack){
 	list_free(stack->list);
 	stack->list = NULL;
+}
+
+int stack_get_data_size(stack* stack){
+	return stack->list->dataSize;
 }
 
 int stack_get_count(stack* stack){
@@ -23,10 +27,14 @@ void stack_push(stack* stack, void* value){
 }
 
 void stack_pop(stack* stack, void* value){
+	assert(stack_get_count(stack) > 0);
 	list_get_front(stack->list, value);
 	list_delete_from_front(stack->list);
 }
 
 void stack_peek(stack* stack, void* value){
+
+	assert(stack_get_count(stack) > 0);
+
 	list_get_front(stack->list, value);
 }
