@@ -6,17 +6,17 @@ typedef void (*freeDataFunction)(void *);
 typedef int (*compareValuesFunction)(void *, void*);
 
 struct node {
-	struct node* next;
-	struct node* previous;
-	void* data;
+    struct node* next;
+    struct node* previous;
+    void* data;
 };
 
 typedef struct {
-	struct node* front;
-	struct node* back;
-	freeDataFunction freeData;
-	int length;
-	int dataSize;
+    struct node* front;
+    struct node* back;
+    freeDataFunction freeData;
+    int length;
+    int dataSize;
 } list;
 
 

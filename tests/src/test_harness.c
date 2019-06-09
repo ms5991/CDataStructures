@@ -4,15 +4,15 @@
 #include <time.h>
 
 void init_test_harness(){
-	srand(time(NULL));   
+    srand(time(NULL));
 }
 
 int main(){
 
-	init_test_harness();
+    init_test_harness();
 
-	test_all_list_scenarios();
-	test_all_stack_scenarios();
+    test_all_list_scenarios();
+    test_all_stack_scenarios();
 
-	return 0;
+    return 0;
 }
