@@ -13,17 +13,15 @@ void test_stack_new_int(){
 
     stack_new(&stack, sizeof(int), NULL);
 
-    /* length should be zero
-    */
+    // length should be zero
     assert(stack_get_count(&stack) == 0);
 
-    /* data size should be what was passed in
-    */
+    // data size should be what was passed in
     assert(stack_get_data_size(&stack) == sizeof(int));
 
     stack_free(&stack);
 
-    printf("Test stack new int SUCCEEDED\n");
+    printf("[%s]: Test stack new int SUCCEEDED\n", __func__);
 
 }
 
@@ -41,7 +39,7 @@ void test_stack_free(){
 
     assert(stack.list == NULL);
 
-    printf("Test stack free int SUCCEEDED\n");
+    printf("[%s]: Test stack free int SUCCEEDED\n", __func__);
 }
 
 void test_stack_push_empty(){
@@ -63,7 +61,7 @@ void test_stack_push_empty(){
 
     stack_free(&stack);
 
-    printf("Test stack push empty int SUCCEEDED\n");
+    printf("[%s]: Test stack push empty int SUCCEEDED\n", __func__);
 }
 
 void test_stack_get_length(){
@@ -80,7 +78,7 @@ void test_stack_get_length(){
 
     stack_free(&stack);
 
-    printf("Test stack get length int SUCCEEDED\n");
+    printf("[%s]: Test stack get length int SUCCEEDED\n", __func__);
 
 }
 
@@ -104,15 +102,68 @@ void test_stack_push_non_empty(){
 
     stack_free(&stack);
 
-    printf("Test stack push non empty int SUCCEEDED\n");
-
+    printf("[%s]: Test stack push non empty int SUCCEEDED\n", __func__);
 }
 
-void test_stack_pop_to_empty(){}
+void test_stack_pop_to_empty(){
+    stack stack;
+    int first, popVal;
 
-void test_stack_pop_to_non_empty(){}
+    stack_new(&stack, sizeof(int), NULL);
 
-void test_stack_new_str(){}
+    first = VALUE_TO_ADD;
+
+    stack_push(&stack, &first);
+
+    stack_pop(&stack, &popVal);
+
+    assert(stack_get_count(&stack) == 0);
+    assert(popVal == first);
+    stack_free(&stack);
+
+    printf("[%s]: Test stack pop to empty int SUCCEEDED\n", __func__);
+}
+
+void test_stack_pop_to_non_empty(){
+    stack stack;
+    int first, second, popVal, peekVal;
+
+    stack_new(&stack, sizeof(int), NULL);
+
+    first = VALUE_TO_ADD;
+    second = VALUE_TO_ADD + 1;
+
+    stack_push(&stack, &first);
+    stack_push(&stack, &second);
+
+    stack_pop(&stack, &popVal);
+    stack_peek(&stack, &peekVal);
+
+    assert(stack_get_count(&stack) == 1);
+    assert(popVal == second);
+    assert(peekVal == first);
+
+    stack_free(&stack);
+
+    printf("[%s]: Test stack pop to non-empty int SUCCEEDED\n", __func__);
+}
+
+void test_stack_new_str(){
+    stack stack;
+
+    stack_new(&stack, sizeof(char*), NULL);
+
+    // length should be zero
+    assert(stack_get_count(&stack) == 0);
+
+    // data size should be what was passed in
+    assert(stack_get_data_size(&stack) == sizeof(char*));
+
+    stack_free(&stack);
+
+    printf("[%s]: Test stack new str SUCCEEDED\n", __func__);
+
+}
 
 void test_stack_push_empty_str(){}
 
